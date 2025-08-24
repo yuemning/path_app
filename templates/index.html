@@ -51,7 +51,7 @@
         }
 
         .station-name {
-            font-size: calc(2rem * var(--scale));
+            font-size: calc(1.4rem * var(--scale));
             font-weight: 600;
             letter-spacing: 0.2px;
             color: var(--text);
@@ -215,31 +215,44 @@
         #countdownView { display: none; }
         .mode-countdown #countdownView { display: block; }
         .mode-countdown .departures-container { display: none; }
+        .mode-countdown .weather-info { display: none; }
         .countdown-card {
             background: #0b1117;
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 32px;
+            padding: 32px 40px;
             display: grid;
-            gap: 14px;
+            gap: 18px;
             place-items: center;
+            width: 100%;
         }
         .countdown-title {
-            font-size: calc(1.1rem * var(--scale));
+            font-size: clamp(0.9rem, 1.6vw, 1.2rem);
             color: var(--muted);
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
         .countdown-time {
             font-variant-numeric: tabular-nums;
-            font-size: calc(3.4rem * var(--scale));
+            font-size: clamp(3.5rem, 12vw, 12rem);
             font-weight: 800;
             letter-spacing: 1px;
         }
+        .countdown-time.secondary {
+            font-size: clamp(2rem, 6.5vw, 6rem);
+            font-weight: 700;
+            opacity: 0.9;
+        }
         .countdown-subtle {
-            font-size: calc(0.95rem * var(--scale));
+            font-size: clamp(0.9rem, 1.4vw, 1.1rem);
             color: var(--muted);
         }
+        .countdown-row { display: grid; gap: 8px; place-items: center; }
+        .countdown-label { font-size: calc(0.9rem * var(--scale)); color: var(--muted); }
+        .countdown-time.red { color: #f97066; }
+        .countdown-time.orange { color: #f59e0b; }
+        .countdown-time.green { color: #34d399; }
+        .countdown-time.blue { color: #60a5fa; }
 
         @media (max-width: 900px) {
             .container {
@@ -329,9 +342,17 @@
 
         <div id="countdownView">
             <div class="countdown-card">
-                <div class="countdown-title">Next World Trade Center train</div>
-                <div class="countdown-time" id="wtcCountdown">--:--</div>
-                <div class="countdown-subtle" id="wtcEtaLabel">Calculating…</div>
+                <div class="countdown-title">World Trade Center Trains</div>
+                <div class="countdown-row">
+                    <div class="countdown-label">Next</div>
+                    <div class="countdown-time" id="wtcCountdown1">--:--</div>
+                    <div class="countdown-subtle" id="wtcEtaLabel1">Calculating…</div>
+                </div>
+                <div class="countdown-row">
+                    <div class="countdown-label">Then</div>
+                    <div class="countdown-time secondary" id="wtcCountdown2">--:--</div>
+                    <div class="countdown-subtle" id="wtcEtaLabel2">Calculating…</div>
+                </div>
             </div>
         </div>
     </div>
@@ -341,12 +362,13 @@
         let countdownInterval;
         let nextRefresh = 30;
         let latestDeparturesData = null;
-        let isCountdownView = false;
+        let isCountdownView = true;
+        let departuresBaselineMs = null;
 
         function updateTick() {
             const indicator = document.getElementById('refreshIndicator');
-            const mode = isCountdownView ? 'Countdown' : 'Departures';
-            indicator.textContent = `🔄 ${mode} • Refresh in ${nextRefresh}s`;
+            const mode = isCountdownView ? 'Countdown' : 'More Trains';
+            indicator.textContent = `🔄 ${mode} • Refresh in ${nextRefresh}s (press T to toggle)`;
 
             if (isCountdownView) updateWtcCountdown();
 
@@ -386,6 +408,7 @@
             const lastUpdated = document.getElementById('lastUpdated');
             
             latestDeparturesData = data;
+            departuresBaselineMs = Date.now();
 
             if (!data.departures || data.departures.length === 0) {
                 nyContainer.innerHTML = '<div class="error">No departures</div>';
@@ -433,26 +456,53 @@
             };
             const candidates = data.departures.filter(d => d.direction === 'To New York' && isWtc(d.destination));
             if (candidates.length === 0) return null;
-            const seconds = candidates
+            const elapsed = departuresBaselineMs ? Math.floor((Date.now() - departuresBaselineMs) / 1000) : 0;
+            const sorted = candidates
                 .map(d => parseInt(d.seconds_to_arrival))
                 .filter(s => Number.isFinite(s))
-                .sort((a,b) => a-b)[0];
-            return Number.isFinite(seconds) ? seconds : null;
+                .map(base => Math.max(0, base - elapsed))
+                .sort((a,b) => a-b);
+            return sorted;
+        }
+
+        function colorForSeconds(seconds) {
+            if (seconds < 120) return 'red';
+            if (seconds < 300) return 'orange';
+            if (seconds < 600) return 'green';
+            return 'blue';
         }
 
         function updateWtcCountdown() {
-            const el = document.getElementById('wtcCountdown');
-            const label = document.getElementById('wtcEtaLabel');
-            const seconds = findNextWtcSeconds(latestDeparturesData);
-            if (seconds == null) {
-                el.textContent = '--:--';
-                label.textContent = 'No upcoming WTC train';
+            const list = findNextWtcSeconds(latestDeparturesData);
+            const ids = [
+                { time: 'wtcCountdown1', label: 'wtcEtaLabel1' },
+                { time: 'wtcCountdown2', label: 'wtcEtaLabel2' }
+            ];
+            if (!list || list.length === 0) {
+                ids.forEach(({time, label}) => {
+                    document.getElementById(time).textContent = '--:--';
+                    document.getElementById(label).textContent = 'No upcoming WTC train';
+                    document.getElementById(time).classList.remove('red','orange','green','blue');
+                });
                 return;
             }
-            const m = Math.max(0, Math.floor(seconds / 60));
-            const s = Math.max(0, seconds % 60);
-            el.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            label.textContent = m === 0 ? 'Less than a minute' : `${m} min`;
+            ids.forEach(({time, label}, idx) => {
+                const seconds = list[idx];
+                const elTime = document.getElementById(time);
+                const elLabel = document.getElementById(label);
+                if (!Number.isFinite(seconds)) {
+                    elTime.textContent = '--:--';
+                    elLabel.textContent = 'No data';
+                    elTime.classList.remove('red','orange','green','blue');
+                    return;
+                }
+                const m = Math.max(0, Math.floor(seconds / 60));
+                const s = Math.max(0, seconds % 60);
+                elTime.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                elLabel.textContent = m === 0 ? 'Less than a minute' : `${m} min`;
+                elTime.classList.remove('red','orange','green','blue');
+                elTime.classList.add(colorForSeconds(seconds));
+            });
         }
 
         function toggleView() {
@@ -518,6 +568,7 @@
         countdownInterval = setInterval(updateTick, 1000);
         
         // Initial countdown setup
+        document.body.classList.add('mode-countdown');
         updateTick();
 
         // Keyboard toggle (T)
