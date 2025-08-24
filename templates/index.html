@@ -11,227 +11,238 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg: #f7f8fa;
+            --card: #ffffff;
+            --text: #101214;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --accent: #0f62fe;
+            --urgent: #d92d20;
+            --soon: #b54708;
+            --normal: #107569;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 24px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1100px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--card);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 10px 24px rgba(16, 18, 20, 0.06);
+            border: 1px solid var(--border);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .station-name {
-            font-size: 2.5em;
-            font-weight: 300;
-            margin-bottom: 10px;
-            color: #ffffff;
-        }
-
-        .last-updated {
-            font-size: 1em;
-            opacity: 0.8;
             margin-bottom: 20px;
         }
 
-        .departures-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .direction-section {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 20px;
-        }
-
-        .direction-title {
-            font-size: 1.4em;
+        .station-name {
+            font-size: 2rem;
             font-weight: 600;
-            margin-bottom: 15px;
-            text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.2px;
+            color: var(--text);
+            margin-bottom: 6px;
         }
 
-        .departures-grid {
-            display: grid;
-            gap: 15px;
+        .last-updated {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 18px;
         }
 
         .weather-info {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
             text-align: center;
+            margin-bottom: 20px;
         }
 
         .weather-item {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 4px;
         }
 
         .weather-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 1.25rem;
         }
 
         .weather-label {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-bottom: 5px;
+            font-size: 0.8rem;
+            color: var(--muted);
         }
 
         .weather-value {
-            font-size: 1.2em;
+            font-size: 1rem;
             font-weight: 600;
         }
 
+        .departures-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-bottom: 8px;
+        }
+
+        .direction-section {
+            padding: 4px;
+        }
+
+        .direction-section + .direction-section {
+            border-left: 1px solid var(--border);
+            padding-left: 28px;
+        }
+
+        .direction-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        .departures-grid {
+            display: grid;
+            gap: 10px;
+        }
+
         .departure-card {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border-left: 5px solid #4CAF50;
+            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
         }
 
         .departure-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            background: #fcfcfd;
+            box-shadow: 0 6px 16px rgba(16, 18, 20, 0.06);
+            transform: translateY(-1px);
         }
 
         .departure-info {
             flex: 1;
+            min-width: 0;
         }
 
         .destination {
-            font-size: 1.4em;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .direction {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .line-indicator {
             display: inline-block;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            margin-right: 8px;
+            flex: 0 0 10px;
         }
 
         .arrival-time {
-            font-size: 2em;
+            font-variant-numeric: tabular-nums;
+            font-size: 1.5rem;
             font-weight: 700;
             text-align: right;
-            min-width: 100px;
+            min-width: 96px;
         }
 
-        .arrival-time.urgent {
-            color: #ff6b6b;
-            animation: pulse 1s infinite;
-        }
-
-        .arrival-time.soon {
-            color: #ffd93d;
-        }
-
-        .arrival-time.normal {
-            color: #6bcf7f;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
+        .arrival-time.urgent { color: var(--urgent); }
+        .arrival-time.soon { color: var(--soon); }
+        .arrival-time.normal { color: var(--normal); }
 
         .loading {
             text-align: center;
-            font-size: 1.2em;
-            opacity: 0.8;
-            padding: 40px;
+            font-size: 0.95rem;
+            color: var(--muted);
+            padding: 20px 0;
         }
 
         .error {
             text-align: center;
-            color: #ff6b6b;
-            font-size: 1.1em;
-            padding: 20px;
-            background: rgba(255, 107, 107, 0.1);
+            color: var(--urgent);
+            font-size: 0.95rem;
+            padding: 14px;
+            background: #fff1f1;
             border-radius: 10px;
-            border: 1px solid rgba(255, 107, 107, 0.3);
+            border: 1px solid #ffd2d2;
         }
 
         .refresh-indicator {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            opacity: 0.8;
+            top: 16px;
+            right: 16px;
+            background: #ffffff;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(16, 18, 20, 0.06);
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                padding: 22px;
+            }
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 20px;
-                margin: 10px;
+                padding: 18px;
             }
-            
+
             .station-name {
-                font-size: 2em;
+                font-size: 1.6rem;
             }
-            
+
             .departures-container {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
-            
-            .weather-info {
-                grid-template-columns: 1fr;
-                gap: 15px;
+
+            .direction-section + .direction-section {
+                border-left: none;
+                padding-left: 4px;
             }
-            
+
             .departure-card {
                 flex-direction: column;
-                text-align: center;
-                gap: 10px;
+                align-items: flex-start;
+                gap: 8px;
             }
-            
+
             .arrival-time {
-                text-align: center;
+                text-align: left;
             }
         }
     </style>
@@ -249,9 +260,9 @@
 
         <div class="weather-info" id="weatherContainer">
             <div class="weather-item">
-                <div class="weather-icon" id="weatherIcon">🌤️</div>
-                <div class="weather-label">Current Weather</div>
-                <div class="weather-value" id="weatherTemp">Loading...</div>
+                <div class="weather-icon" id="weatherIconNY">🌤️</div>
+                <div class="weather-label">Manhattan</div>
+                <div class="weather-value" id="weatherTempNY">Loading...</div>
             </div>
             <div class="weather-item">
                 <div class="weather-icon">🌅</div>
@@ -263,17 +274,22 @@
                 <div class="weather-label">Sunset</div>
                 <div class="weather-value" id="sunsetTime">Loading...</div>
             </div>
+            <div class="weather-item">
+                <div class="weather-icon" id="weatherIconJC">🌤️</div>
+                <div class="weather-label">Jersey City</div>
+                <div class="weather-value" id="weatherTempJC">Loading...</div>
+            </div>
         </div>
 
         <div class="departures-container" id="departuresContainer">
             <div class="direction-section">
-                <div class="direction-title">🗽 To New York</div>
+                <div class="direction-title">NY PATH</div>
                 <div class="departures-grid" id="nyDepartures">
                     <div class="loading">Loading departures...</div>
                 </div>
             </div>
             <div class="direction-section">
-                <div class="direction-title">🏢 To New Jersey</div>
+                <div class="direction-title">NJ PATH</div>
                 <div class="departures-grid" id="njDepartures">
                     <div class="loading">Loading departures...</div>
                 </div>
@@ -386,14 +402,21 @@
                         return;
                     }
                     
-                    document.getElementById('weatherTemp').textContent = data.temperature;
-                    document.getElementById('weatherIcon').textContent = data.icon;
+                    if (data.jersey_city) {
+                        document.getElementById('weatherTempJC').textContent = data.jersey_city.temperature_c;
+                        document.getElementById('weatherIconJC').textContent = data.jersey_city.icon;
+                    }
+                    if (data.manhattan) {
+                        document.getElementById('weatherTempNY').textContent = data.manhattan.temperature_c;
+                        document.getElementById('weatherIconNY').textContent = data.manhattan.icon;
+                    }
                     document.getElementById('sunriseTime').textContent = data.sunrise;
                     document.getElementById('sunsetTime').textContent = data.sunset;
                 })
                 .catch(error => {
                     console.error('Error fetching weather:', error);
-                    document.getElementById('weatherTemp').textContent = 'N/A';
+                    document.getElementById('weatherTempJC').textContent = 'N/A';
+                    document.getElementById('weatherTempNY').textContent = 'N/A';
                     document.getElementById('sunriseTime').textContent = 'N/A';
                     document.getElementById('sunsetTime').textContent = 'N/A';
                 });

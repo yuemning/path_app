@@ -82,13 +82,19 @@ def calculate_sunrise_sunset():
         # Hour angle calculation
         hour_angle = math.acos(-math.tan(latitude_rad) * math.tan(solar_decl))
         
-        # Convert to hours
-        sunrise_hour = 12 - (hour_angle * 12 / math.pi) - (GROVE_STREET_LON / 15) + 1  # +1 for timezone adjustment
+        # Convert to hours (local approximation). Account for timezone offset roughly (+1) and wrap to 24h.
+        sunrise_hour = 12 - (hour_angle * 12 / math.pi) - (GROVE_STREET_LON / 15) + 1
         sunset_hour = 12 + (hour_angle * 12 / math.pi) - (GROVE_STREET_LON / 15) + 1
-        
-        # Convert to time strings
-        sunrise_time = f"{int(sunrise_hour):02d}:{int((sunrise_hour % 1) * 60):02d}"
-        sunset_time = f"{int(sunset_hour):02d}:{int((sunset_hour % 1) * 60):02d}"
+
+        def format_hour_to_hhmm(hour_float: float) -> str:
+            total_minutes = int(round(hour_float * 60)) % (24 * 60)
+            hours = total_minutes // 60
+            minutes = total_minutes % 60
+            return f"{hours:02d}:{minutes:02d}"
+
+        # Convert to time strings with proper wrapping
+        sunrise_time = format_hour_to_hhmm(sunrise_hour)
+        sunset_time = format_hour_to_hhmm(sunset_hour)
         
         return sunrise_time, sunset_time
     except Exception as e:
@@ -96,57 +102,89 @@ def calculate_sunrise_sunset():
         return "6:30", "18:30"  # Fallback times
 
 def get_weather_data():
-    """Get weather data - using a simple weather service"""
+    """Get weather for Jersey City (near Grove St) and Manhattan in Celsius."""
     try:
-        # Using a free weather API (OpenWeatherMap alternative)
-        # For production, you'd want to add an API key
-        weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={GROVE_STREET_LAT}&longitude={GROVE_STREET_LON}&current_weather=true&timezone=America/New_York"
-        
-        response = requests.get(weather_url, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        
-        current = data.get('current_weather', {})
-        temp_c = current.get('temperature', 0)
-        temp_f = round(temp_c * 9/5 + 32)
-        weather_code = current.get('weathercode', 0)
-        
-        # Simple weather icon mapping
+        # Locations: Jersey City (Grove St) and Midtown Manhattan (approx Bryant Park)
+        locations = {
+            'jersey_city': { 'name': 'Jersey City', 'lat': 40.7197, 'lon': -74.0431 },
+            'manhattan': { 'name': 'Manhattan', 'lat': 40.7549, 'lon': -73.9840 },
+        }
+
         weather_icons = {
-            0: '☀️',  # Clear sky
-            1: '🌤️',  # Mainly clear
-            2: '⛅',   # Partly cloudy  
-            3: '☁️',   # Overcast
-            45: '🌫️', # Fog
-            48: '🌫️', # Depositing rime fog
-            51: '🌦️', # Light drizzle
-            53: '🌧️', # Moderate drizzle
-            55: '🌧️', # Dense drizzle
-            61: '🌧️', # Slight rain
-            63: '🌧️', # Moderate rain
-            65: '⛈️',  # Heavy rain
-            71: '🌨️', # Slight snow
-            73: '🌨️', # Moderate snow
-            75: '❄️',  # Heavy snow
-            95: '⛈️',  # Thunderstorm
+            0: '☀️',
+            1: '🌤️',
+            2: '⛅',
+            3: '☁️',
+            45: '🌫️',
+            48: '🌫️',
+            51: '🌦️',
+            53: '🌧️',
+            55: '🌧️',
+            61: '🌧️',
+            63: '🌧️',
+            65: '⛈️',
+            71: '🌨️',
+            73: '🌨️',
+            75: '❄️',
+            95: '⛈️',
         }
-        
-        icon = weather_icons.get(weather_code, '🌤️')
-        sunrise, sunset = calculate_sunrise_sunset()
-        
+
+        results = {}
+        sunrise_time = None
+        sunset_time = None
+        for key, loc in locations.items():
+            weather_url = (
+                f"https://api.open-meteo.com/v1/forecast?latitude={loc['lat']}&longitude={loc['lon']}"
+                f"&current_weather=true&daily=sunrise,sunset&forecast_days=1&timezone=America/New_York"
+            )
+            response = requests.get(weather_url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            current = data.get('current_weather', {})
+            temp_c = round(current.get('temperature', 0))
+            weather_code = current.get('weathercode', 0)
+            icon = weather_icons.get(weather_code, '🌤️')
+
+            results[key] = {
+                'name': loc['name'],
+                'temperature_c': f"{temp_c}°C",
+                'icon': icon,
+            }
+
+            # Capture sunrise/sunset once from the first successful response
+            if sunrise_time is None and 'daily' in data:
+                daily = data.get('daily', {})
+                sunrise_list = daily.get('sunrise', [])
+                sunset_list = daily.get('sunset', [])
+                if sunrise_list and sunset_list:
+                    try:
+                        sunrise_iso = sunrise_list[0]
+                        sunset_iso = sunset_list[0]
+                        # Times are already in America/New_York per API parameter
+                        sunrise_dt = datetime.fromisoformat(sunrise_iso)
+                        sunset_dt = datetime.fromisoformat(sunset_iso)
+                        sunrise_time = sunrise_dt.strftime('%H:%M')
+                        sunset_time = sunset_dt.strftime('%H:%M')
+                    except Exception:
+                        sunrise_time, sunset_time = calculate_sunrise_sunset()
+
+        # Fallback if API daily times were not available
+        if sunrise_time is None or sunset_time is None:
+            sunrise_time, sunset_time = calculate_sunrise_sunset()
+
         return {
-            'temperature': f"{temp_f}°F",
-            'icon': icon,
-            'sunrise': sunrise,
-            'sunset': sunset
+            'jersey_city': results.get('jersey_city', {}),
+            'manhattan': results.get('manhattan', {}),
+            'sunrise': sunrise_time,
+            'sunset': sunset_time
         }
-        
+
     except Exception as e:
         print(f"Error fetching weather data: {e}")
         sunrise, sunset = calculate_sunrise_sunset()
         return {
-            'temperature': 'N/A',
-            'icon': '🌤️',
+            'jersey_city': {'name': 'Jersey City', 'temperature_c': 'N/A', 'icon': '🌤️'},
+            'manhattan': {'name': 'Manhattan', 'temperature_c': 'N/A', 'icon': '🌤️'},
             'sunrise': sunrise,
             'sunset': sunset
         }
