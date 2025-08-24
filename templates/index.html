@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PATH Departures - Grove Street</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .station-name {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .last-updated {
+            font-size: 1em;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .departures-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .direction-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .direction-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .departures-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .weather-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .weather-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .weather-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .weather-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .weather-value {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .departure-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .departure-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .departure-info {
+            flex: 1;
+        }
+
+        .destination {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .direction {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+
+        .line-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .arrival-time {
+            font-size: 2em;
+            font-weight: 700;
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .arrival-time.urgent {
+            color: #ff6b6b;
+            animation: pulse 1s infinite;
+        }
+
+        .arrival-time.soon {
+            color: #ffd93d;
+        }
+
+        .arrival-time.normal {
+            color: #6bcf7f;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            opacity: 0.8;
+            padding: 40px;
+        }
+
+        .error {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 1.1em;
+            padding: 20px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .refresh-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .station-name {
+                font-size: 2em;
+            }
+            
+            .departures-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .weather-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .departure-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .arrival-time {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="refresh-indicator" id="refreshIndicator">
+        🔄 Auto-refresh: 30s
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="station-name">Grove Street Station</h1>
+            <div class="last-updated" id="lastUpdated">Loading...</div>
+        </div>
+
+        <div class="weather-info" id="weatherContainer">
+            <div class="weather-item">
+                <div class="weather-icon" id="weatherIcon">🌤️</div>
+                <div class="weather-label">Current Weather</div>
+                <div class="weather-value" id="weatherTemp">Loading...</div>
+            </div>
+            <div class="weather-item">
+                <div class="weather-icon">🌅</div>
+                <div class="weather-label">Sunrise</div>
+                <div class="weather-value" id="sunriseTime">Loading...</div>
+            </div>
+            <div class="weather-item">
+                <div class="weather-icon">🌇</div>
+                <div class="weather-label">Sunset</div>
+                <div class="weather-value" id="sunsetTime">Loading...</div>
+            </div>
+        </div>
+
+        <div class="departures-container" id="departuresContainer">
+            <div class="direction-section">
+                <div class="direction-title">🗽 To New York</div>
+                <div class="departures-grid" id="nyDepartures">
+                    <div class="loading">Loading departures...</div>
+                </div>
+            </div>
+            <div class="direction-section">
+                <div class="direction-title">🏢 To New Jersey</div>
+                <div class="departures-grid" id="njDepartures">
+                    <div class="loading">Loading departures...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+        let countdownInterval;
+        let nextRefresh = 30;
+
+        function updateRefreshIndicator() {
+            const indicator = document.getElementById('refreshIndicator');
+            indicator.textContent = `🔄 Auto-refresh: ${nextRefresh}s`;
+            
+            if (nextRefresh <= 0) {
+                nextRefresh = 30;
+                fetchDepartures();
+            } else {
+                nextRefresh--;
+            }
+        }
+
+        function getLineColor(colorString) {
+            if (!colorString) return '#4CAF50';
+            
+            // Handle multiple colors (e.g., "4D92FB,FF9900")
+            const colors = colorString.split(',');
+            return `#${colors[0]}`;
+        }
+
+        function getArrivalTimeClass(arrivalTime, seconds) {
+            if (arrivalTime.includes('Delayed')) return 'urgent';
+            
+            const secondsNum = parseInt(seconds);
+            if (secondsNum <= 300) return 'urgent';  // 5 minutes or less
+            if (secondsNum <= 600) return 'soon';    // 10 minutes or less
+            return 'normal';
+        }
+
+        function formatDestination(headSign) {
+            // Keep the full destination name but clean up minor formatting
+            return headSign.replace('33rd Street', '33rd St');
+        }
+
+        function renderDepartures(data) {
+            const nyContainer = document.getElementById('nyDepartures');
+            const njContainer = document.getElementById('njDepartures');
+            const lastUpdated = document.getElementById('lastUpdated');
+            
+            if (!data.departures || data.departures.length === 0) {
+                nyContainer.innerHTML = '<div class="error">No departures</div>';
+                njContainer.innerHTML = '<div class="error">No departures</div>';
+                return;
+            }
+
+            lastUpdated.textContent = `Last updated: ${data.last_fetch}`;
+            
+            // Separate departures by direction
+            const nyDepartures = data.departures.filter(d => d.direction === 'To New York');
+            const njDepartures = data.departures.filter(d => d.direction === 'To New Jersey');
+            
+            function createDepartureHTML(departure) {
+                return `
+                    <div class="departure-card" style="border-left-color: ${getLineColor(departure.line_color)}">
+                        <div class="departure-info">
+                            <div class="destination">
+                                <span class="line-indicator" style="background-color: ${getLineColor(departure.line_color)}"></span>
+                                ${formatDestination(departure.destination)}
+                            </div>
+                        </div>
+                        <div class="arrival-time ${getArrivalTimeClass(departure.arrival_time, departure.seconds_to_arrival)}">
+                            ${departure.arrival_time}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            nyContainer.innerHTML = nyDepartures.length > 0 ? 
+                nyDepartures.map(createDepartureHTML).join('') : 
+                '<div class="loading">No trains to NY</div>';
+                
+            njContainer.innerHTML = njDepartures.length > 0 ? 
+                njDepartures.map(createDepartureHTML).join('') : 
+                '<div class="loading">No trains to NJ</div>';
+        }
+
+        function fetchDepartures() {
+            fetch('/api/departures')
+                .then(response => response.json())
+                .then(data => {
+                    renderDepartures(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching departures:', error);
+                    document.getElementById('nyDepartures').innerHTML = 
+                        '<div class="error">Failed to load departures</div>';
+                    document.getElementById('njDepartures').innerHTML = 
+                        '<div class="error">Failed to load departures</div>';
+                });
+        }
+
+        function fetchWeather() {
+            fetch('/api/weather')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.log('Weather data not available');
+                        return;
+                    }
+                    
+                    document.getElementById('weatherTemp').textContent = data.temperature;
+                    document.getElementById('weatherIcon').textContent = data.icon;
+                    document.getElementById('sunriseTime').textContent = data.sunrise;
+                    document.getElementById('sunsetTime').textContent = data.sunset;
+                })
+                .catch(error => {
+                    console.error('Error fetching weather:', error);
+                    document.getElementById('weatherTemp').textContent = 'N/A';
+                    document.getElementById('sunriseTime').textContent = 'N/A';
+                    document.getElementById('sunsetTime').textContent = 'N/A';
+                });
+        }
+
+        // Initialize
+        fetchDepartures();
+        fetchWeather();
+        
+        // Set up auto-refresh every 30 seconds for departures, every 5 minutes for weather
+        refreshInterval = setInterval(fetchDepartures, 30000);
+        setInterval(fetchWeather, 300000); // 5 minutes
+        
+        // Update countdown indicator every second
+        countdownInterval = setInterval(updateRefreshIndicator, 1000);
+        
+        // Initial countdown setup
+        updateRefreshIndicator();
+    </script>
+</body>
+</html>
