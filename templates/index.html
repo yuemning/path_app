@@ -12,15 +12,16 @@
         }
 
         :root {
-            --bg: #f7f8fa;
-            --card: #ffffff;
-            --text: #101214;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --accent: #0f62fe;
-            --urgent: #d92d20;
-            --soon: #b54708;
-            --normal: #107569;
+            --bg: #0b0f14;
+            --card: #0f141a;
+            --text: #e5e7eb;
+            --muted: #9aa4b2;
+            --border: #1f2937;
+            --accent: #60a5fa;
+            --urgent: #f97066;
+            --soon: #f59e0b;
+            --normal: #34d399;
+            --scale: 1.15; /* global scale up */
         }
 
         body {
@@ -31,16 +32,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 24px;
+            padding: 28px;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             width: 100%;
             background: var(--card);
             border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 10px 24px rgba(16, 18, 20, 0.06);
+            padding: 36px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
             border: 1px solid var(--border);
         }
 
@@ -50,7 +51,7 @@
         }
 
         .station-name {
-            font-size: 2rem;
+            font-size: calc(2rem * var(--scale));
             font-weight: 600;
             letter-spacing: 0.2px;
             color: var(--text);
@@ -58,21 +59,21 @@
         }
 
         .last-updated {
-            font-size: 0.95rem;
+            font-size: calc(1rem * var(--scale));
             color: var(--muted);
-            margin-bottom: 18px;
+            margin-bottom: 22px;
         }
 
         .weather-info {
-            background: #fafafa;
+            background: #0b1117;
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 18px 20px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 16px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .weather-item {
@@ -83,24 +84,24 @@
         }
 
         .weather-icon {
-            font-size: 1.25rem;
+            font-size: calc(1.35rem * var(--scale));
         }
 
         .weather-label {
-            font-size: 0.8rem;
+            font-size: calc(0.9rem * var(--scale));
             color: var(--muted);
         }
 
         .weather-value {
-            font-size: 1rem;
+            font-size: calc(1.15rem * var(--scale));
             font-weight: 600;
         }
 
         .departures-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 28px;
-            margin-bottom: 8px;
+            gap: 32px;
+            margin-bottom: 12px;
         }
 
         .direction-section {
@@ -113,25 +114,25 @@
         }
 
         .direction-title {
-            font-size: 0.9rem;
+            font-size: calc(1rem * var(--scale));
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--muted);
             text-align: left;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .departures-grid {
             display: grid;
-            gap: 10px;
+            gap: 12px;
         }
 
         .departure-card {
-            background: var(--card);
+            background: #0b1117;
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 18px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -139,8 +140,8 @@
         }
 
         .departure-card:hover {
-            background: #fcfcfd;
-            box-shadow: 0 6px 16px rgba(16, 18, 20, 0.06);
+            background: #0d131a;
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
             transform: translateY(-1px);
         }
 
@@ -150,7 +151,7 @@
         }
 
         .destination {
-            font-size: 1rem;
+            font-size: calc(1.1rem * var(--scale));
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -170,10 +171,10 @@
 
         .arrival-time {
             font-variant-numeric: tabular-nums;
-            font-size: 1.5rem;
+            font-size: calc(1.8rem * var(--scale));
             font-weight: 700;
             text-align: right;
-            min-width: 96px;
+            min-width: 110px;
         }
 
         .arrival-time.urgent { color: var(--urgent); }
@@ -182,47 +183,77 @@
 
         .loading {
             text-align: center;
-            font-size: 0.95rem;
+            font-size: calc(1rem * var(--scale));
             color: var(--muted);
-            padding: 20px 0;
+            padding: 22px 0;
         }
 
         .error {
             text-align: center;
             color: var(--urgent);
-            font-size: 0.95rem;
-            padding: 14px;
-            background: #fff1f1;
+            font-size: calc(1rem * var(--scale));
+            padding: 16px;
+            background: rgba(217, 45, 32, 0.08);
             border-radius: 10px;
-            border: 1px solid #ffd2d2;
+            border: 1px solid rgba(217, 45, 32, 0.22);
         }
 
         .refresh-indicator {
             position: fixed;
             top: 16px;
             right: 16px;
-            background: #ffffff;
-            padding: 8px 12px;
+            background: #0f141a;
+            padding: 10px 14px;
             border-radius: 999px;
-            font-size: 0.85rem;
+            font-size: calc(0.95rem * var(--scale));
             color: var(--muted);
             border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(16, 18, 20, 0.06);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Countdown View */
+        #countdownView { display: none; }
+        .mode-countdown #countdownView { display: block; }
+        .mode-countdown .departures-container { display: none; }
+        .countdown-card {
+            background: #0b1117;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            display: grid;
+            gap: 14px;
+            place-items: center;
+        }
+        .countdown-title {
+            font-size: calc(1.1rem * var(--scale));
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .countdown-time {
+            font-variant-numeric: tabular-nums;
+            font-size: calc(3.4rem * var(--scale));
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .countdown-subtle {
+            font-size: calc(0.95rem * var(--scale));
+            color: var(--muted);
         }
 
         @media (max-width: 900px) {
             .container {
-                padding: 22px;
+                padding: 26px;
             }
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 18px;
+                padding: 22px;
             }
 
             .station-name {
-                font-size: 1.6rem;
+                font-size: calc(1.8rem * var(--scale));
             }
 
             .departures-container {
@@ -295,17 +326,30 @@
                 </div>
             </div>
         </div>
+
+        <div id="countdownView">
+            <div class="countdown-card">
+                <div class="countdown-title">Next World Trade Center train</div>
+                <div class="countdown-time" id="wtcCountdown">--:--</div>
+                <div class="countdown-subtle" id="wtcEtaLabel">Calculating…</div>
+            </div>
+        </div>
     </div>
 
     <script>
         let refreshInterval;
         let countdownInterval;
         let nextRefresh = 30;
+        let latestDeparturesData = null;
+        let isCountdownView = false;
 
-        function updateRefreshIndicator() {
+        function updateTick() {
             const indicator = document.getElementById('refreshIndicator');
-            indicator.textContent = `🔄 Auto-refresh: ${nextRefresh}s`;
-            
+            const mode = isCountdownView ? 'Countdown' : 'Departures';
+            indicator.textContent = `🔄 ${mode} • Refresh in ${nextRefresh}s`;
+
+            if (isCountdownView) updateWtcCountdown();
+
             if (nextRefresh <= 0) {
                 nextRefresh = 30;
                 fetchDepartures();
@@ -341,6 +385,8 @@
             const njContainer = document.getElementById('njDepartures');
             const lastUpdated = document.getElementById('lastUpdated');
             
+            latestDeparturesData = data;
+
             if (!data.departures || data.departures.length === 0) {
                 nyContainer.innerHTML = '<div class="error">No departures</div>';
                 njContainer.innerHTML = '<div class="error">No departures</div>';
@@ -376,6 +422,44 @@
             njContainer.innerHTML = njDepartures.length > 0 ? 
                 njDepartures.map(createDepartureHTML).join('') : 
                 '<div class="loading">No trains to NJ</div>';
+        }
+
+        function findNextWtcSeconds(data) {
+            if (!data || !data.departures) return null;
+            const isWtc = (name) => {
+                if (!name) return false;
+                const n = name.toLowerCase();
+                return n.includes('world trade');
+            };
+            const candidates = data.departures.filter(d => d.direction === 'To New York' && isWtc(d.destination));
+            if (candidates.length === 0) return null;
+            const seconds = candidates
+                .map(d => parseInt(d.seconds_to_arrival))
+                .filter(s => Number.isFinite(s))
+                .sort((a,b) => a-b)[0];
+            return Number.isFinite(seconds) ? seconds : null;
+        }
+
+        function updateWtcCountdown() {
+            const el = document.getElementById('wtcCountdown');
+            const label = document.getElementById('wtcEtaLabel');
+            const seconds = findNextWtcSeconds(latestDeparturesData);
+            if (seconds == null) {
+                el.textContent = '--:--';
+                label.textContent = 'No upcoming WTC train';
+                return;
+            }
+            const m = Math.max(0, Math.floor(seconds / 60));
+            const s = Math.max(0, seconds % 60);
+            el.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            label.textContent = m === 0 ? 'Less than a minute' : `${m} min`;
+        }
+
+        function toggleView() {
+            isCountdownView = !isCountdownView;
+            document.body.classList.toggle('mode-countdown', isCountdownView);
+            // Refresh countdown immediately when entering countdown mode
+            if (isCountdownView) updateWtcCountdown();
         }
 
         function fetchDepartures() {
@@ -431,10 +515,17 @@
         setInterval(fetchWeather, 300000); // 5 minutes
         
         // Update countdown indicator every second
-        countdownInterval = setInterval(updateRefreshIndicator, 1000);
+        countdownInterval = setInterval(updateTick, 1000);
         
         // Initial countdown setup
-        updateRefreshIndicator();
+        updateTick();
+
+        // Keyboard toggle (T)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 't' || e.key === 'T') {
+                toggleView();
+            }
+        });
     </script>
 </body>
 </html>
